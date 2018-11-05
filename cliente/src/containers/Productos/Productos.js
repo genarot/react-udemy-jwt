@@ -1,7 +1,8 @@
 import React,{Component} from 'react';
 import Producto from '../../components/Producto';
 import Buscador from '../../components/Buscador/Buscador';
-import { log } from 'util';
+import axios from 'axios';
+import LoginRequired from '../../components/LoginRequired';
 
 export default class Productos extends Component {
     state = {
@@ -12,25 +13,47 @@ export default class Productos extends Component {
         console.log(busqueda);
         
         if ( busqueda.length > 3) {
+            //obtener copia del state
+            let productos = this.state.productos;
+            let resultado;
+            //filtrar 
+            resultado = productos.filter( producto => {
+                console.log(producto);
+                
+                return producto.nombre.toLowerCase().indexOf(busqueda.toLowerCase()) !== -1
+            })
+            //enviar al state los productos filtrados y la busqueda
             this.setState({
-                terminoBusqueda:busqueda
+                terminoBusqueda:busqueda,
+                productos: resultado
             })
         } else {
             this.setState({
                 terminoBusqueda: ''
-            })
+            }, () => {
+
+                this.queryAPI()
+            }
+            )
         }
     }
-    componentDidMount() {
+    componentWillMount() {
         // this.setState({
         //     productos: []
         // })
         this.queryAPI();
     }
     queryAPI = () => {
+        //
+        const { getAccessToken } = this.props.auth;
+
+        const headers = {'Authorization': `Bearer ${getAccessToken()}`}
+
+        const url = 'http://localhost:8080/productos';
         
-        console.log(this.props.auth);
-        
+        return axios.get(url, {headers})
+                .then( resp => this.setState({productos: resp.data}) )
+        console.log(headers);
     }
     
     login = () => {
@@ -40,30 +63,25 @@ export default class Productos extends Component {
     render() {
         const {isAuthenticated}  = this.props.auth;
         console.log(this.props.auth.isAuthenticated());
-        let resultado= this.state.productos;
-        let busqueda = this.state.terminoBusqueda;
-        resultado = resultado.filter( producto => (
-            producto.nombre.toLowerCase().indexOf(busqueda.toLowerCase()) !== -1
-        ))
+        
         return (
             <div className="productos">
-                <h2>Nuestros Productos</h2>
-                <Buscador busqueda={this.busquedaProducto}/>
                 {isAuthenticated() && (
-                    <ul className="lista-productos">
-                        {
-                            resultado.map( (producto, index) => {
-                                return <Producto key={index} info={producto}/>
-                            })
-                        }
-                    </ul>
+                    <React.Fragment>
+                        <h2>Nuestros Productos</h2>
+                        <Buscador busqueda={this.busquedaProducto}/>
+                        <ul className="lista-productos">
+                            {
+                                this.state.productos.map( (producto, index) => {
+                                    return <Producto key={index} info={producto}/>
+                                })
+                            }
+                        </ul>
+                    </React.Fragment>
                 )
                 }
                 { !isAuthenticated() && (
-                    <div className="contenedor-boton">
-                        <p>Para ver el contenido debes estar logueado</p>
-                        <a className="boton" onClick={this.login}>Iniciar Sesion</a>
-                    </div>
+                    <LoginRequired login={this.login} />
                 )
                 }
             </div>

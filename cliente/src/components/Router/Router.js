@@ -34,11 +34,11 @@ export default class Router extends Component {
         
         return (
             <BrowserRouter history={history}>
-                <React.Fragment>
+                <div className="contenedor">
                     <Header />
-                    <Navegacion />
+                    <Navegacion auth= {auth}/>
                     <Switch>
-                        <Route  path="/" render={ (props) => (
+                        <Route  exact path="/" render={ (props) => (
                                 <Productos 
                                 auth={auth} {...props} />
                         )} />
@@ -52,17 +52,19 @@ export default class Router extends Component {
                         }}/>
                         <Route  exact path="/productos" render={ (props) => (
                             <Productos 
-                            auth={auth} {...props} />
+                                auth={auth} {...props} />
                         )} />
                         <Route  exact path="/nosotros" component={Nosotros}/>
-                        <Route  exact path="/contacto" component={Contacto}/>
-                        <Route  activeStyle={style} component={Error404} />
-                        <Route  path="/callback" render={(props) => {
+                        <Route  exact path="/contacto"   render={ (props) => (
+                            <Contacto auth={auth} />
+                        )}/>
+                        <Route  exact path="/callback" render={(props) => {
                             handleAuthentication(props);
                             return <Callback {...props} />
                         }}/>
+                        <Route  activeStyle={style} component={Error404} />
                     </Switch>
-                </React.Fragment>
+                </div>
             </BrowserRouter>
         )
     }

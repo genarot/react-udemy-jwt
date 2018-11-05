@@ -8,6 +8,7 @@
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "react": "^16.6.0",
+    "react-bootstrap": "^0.31.0",
     "react-css-modules": "^4.7.7",
     "react-dom": "^16.6.0",
     "react-scripts": "2.0.5"

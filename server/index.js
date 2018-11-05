@@ -1,9 +1,9 @@
 import  express from 'express';
-const jwt = require('express-jwt');
-const cors = require('cors');
-const jwks = require('jwks-rsa');
-const jwtAuthz = require('express-jwt-authz');
-const bodyParser = require('body-parser');
+import jwt from 'express-jwt';
+import cors  from'cors';
+import jwks from 'jwks-rsa';
+import jwtAuthz from 'express-jwt-authz';
+import bodyParser from 'body-parser';
 import productos from './productos.json';
 
 //crear servidor
@@ -36,6 +36,8 @@ app.get('/productos', jwtCheck,checkScopes, (req, res) => {
     res.status(200)
             .json(productos)
 })
+
+// app.use(jwtCheck)
 
 app.listen(port, () => {
     console.log('Servidor Inicia');
